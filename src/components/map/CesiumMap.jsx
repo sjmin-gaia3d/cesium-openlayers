@@ -14,7 +14,45 @@ const CesiumMap = () => {
   useLoadTerrain(cesiumViewer);
 
   useSyncMap({ cesiumViewer });
-//   useSyncZoom({ cesiumViewer });
+  //   useSyncZoom({ cesiumViewer });
+  useEffect(() => {
+    if (cesiumViewer) {
+      cesiumViewer.flyTo(
+        cesiumViewer.entities.add({
+          position: Cesium.Cartesian3.fromDegrees(127.024612, 37.5326),
+          point: {
+            pixelSize: 10,
+            color: Cesium.Color.RED,
+            heightReference: Cesium.HeightReference.CLAMP_TO_GROUND, // 지형에 붙이기
+          },
+        })
+      )
+      cesiumViewer.entities.add({
+        polyline: {
+          positions: Cesium.Cartesian3.fromDegreesArray([
+            127.024612, 37.5326,
+            126.978388, 37.566536,
+          ]),
+          width: 3,
+          material: Cesium.Color.BLUE,
+          clampToGround: true, // 지형에 붙이기
+        },
+      });
+
+      cesiumViewer.entities.add({
+        polygon: {
+          hierarchy: Cesium.Cartesian3.fromDegreesArray([
+            127.024612, 37.5326,
+            126.978388, 37.566536,
+            127.035278, 37.582839,
+          ]),
+          material: Cesium.Color.GREEN.withAlpha(0.5),
+          classificationType: Cesium.ClassificationType.TERRAIN, // 지형에 붙이기
+        },
+      });
+
+    }
+  }, [cesiumViewer])
 
   return (
     <div ref={viewContainerRef} style={{ position: "relative", width: "100%", height: "100vh" }}>
