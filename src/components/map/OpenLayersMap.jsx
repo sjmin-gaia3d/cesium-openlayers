@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import useInitOlMap from "../../hooks/init/useInitOlMap";
 import { useSyncMap } from "../../hooks/sync/useSyncMap";
 import { useSyncZoom } from "../../hooks/sync/useSyncZoom";
@@ -8,16 +8,22 @@ import { Feature } from "ol";
 import VectorSource from "ol/source/Vector";
 import VectorLayer from "ol/layer/Vector";
 import { fromLonLat } from "ol/proj";
+import useMapStore from "../../store/useMapStore";
+import { useShallow } from "zustand/shallow";
 const OpenLayersMap = () => {
     const mapRef = useRef(null);
-    const { olMap } = useInitOlMap(mapRef);
+    useInitOlMap(mapRef);
 
-    useSyncMap({ olMap });
+    const { olMap } = useMapStore(
+        useShallow((state) => ({ olMap: state.olMap}))
+      );
+
     // useSyncZoom({ olMap });
     // useAdjustZoomRange({ olMap });
 
     useEffect(() => {
         if (olMap) {
+            
             // 점 생성
             const point = new Point(fromLonLat([127.024612, 37.5326]));
             const pointFeature = new Feature({ geometry: point });

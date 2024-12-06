@@ -5,18 +5,25 @@ import useLoadTerrain from "../../hooks/useLoadTerrain";
 import useCesiumLayerControls from "../../hooks/layers/useCesiumLayerControls";
 import { useSyncMap } from "../../hooks/sync/useSyncMap";
 import { useSyncZoom } from "../../hooks/sync/useSyncZoom";
+import { useShallow } from "zustand/shallow";
+import useMapStore from "../../store/useMapStore";
 
 const CesiumMap = () => {
   const viewContainerRef = useRef(null);
-  const { cesiumViewer } = useInitCesiumViewer(viewContainerRef);
-  const { toggleOSMLayer, toggleGoogleTileset, resetToDefault } = useCesiumLayerControls(cesiumViewer);
+  useInitCesiumViewer(viewContainerRef);
 
-  useLoadTerrain(cesiumViewer);
+  const { cesiumViewer } = useMapStore(
+    useShallow((state) => ({ cesiumViewer: state.cesiumViewer}))
+  );
+  const { toggleOSMLayer, toggleGoogleTileset, resetToDefault } = useCesiumLayerControls();
 
-  useSyncMap({ cesiumViewer });
+  useLoadTerrain();
+
+
   //   useSyncZoom({ cesiumViewer });
   useEffect(() => {
     if (cesiumViewer) {
+      
       cesiumViewer.flyTo(
         cesiumViewer.entities.add({
           position: Cesium.Cartesian3.fromDegrees(127.024612, 37.5326),
