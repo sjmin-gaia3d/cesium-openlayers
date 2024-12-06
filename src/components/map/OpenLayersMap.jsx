@@ -17,7 +17,7 @@ const OpenLayersMap = () => {
     const { olMap } = useMapStore(
         useShallow((state) => ({ olMap: state.olMap}))
       );
-    useSyncMap();
+
     // useSyncZoom({ olMap });
     // useAdjustZoomRange({ olMap });
 

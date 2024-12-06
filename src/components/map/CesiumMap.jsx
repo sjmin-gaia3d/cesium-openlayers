@@ -19,7 +19,7 @@ const CesiumMap = () => {
 
   useLoadTerrain();
 
-  useSyncMap();
+
   //   useSyncZoom({ cesiumViewer });
   useEffect(() => {
     if (cesiumViewer) {

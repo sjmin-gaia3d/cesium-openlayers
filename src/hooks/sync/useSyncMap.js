@@ -5,7 +5,7 @@ import { useSyncContext } from "../../context/SyncContext";
 import useMapStore from "../../store/useMapStore";
 import { useShallow } from "zustand/shallow";
 
-export const useSyncMap = () => {
+export const useSyncMap = (isSyncActive) => {
 
   const { cesiumViewer, olMap, centerCoordinates, setCenterCoordinates, rotation, setRotation } = useMapStore(
     useShallow((state) => ({
@@ -16,8 +16,6 @@ export const useSyncMap = () => {
 
     }))
   );
-
-  const { isSyncActive } = useSyncContext();
 
   const normalizeAngle = useCallback((angle) => ((angle % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI), []);
 
