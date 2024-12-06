@@ -1,12 +1,13 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { Map as OlMap, View } from 'ol';
 import { fromLonLat } from 'ol/proj';
 import TileLayer from 'ol/layer/Tile';
 import { OSM } from 'ol/source';
 import { defaults } from 'ol/control/defaults';
+import useMapStore from '../../store/useMapStore';
 
-const useinitOlMap = ( mapRef ) => {
-    const [ olMap, setOlMap ] = useState(null);
+const useInitOlMap = ( mapRef ) => {
+    const setOlMap = useMapStore((state) => state.setOlMap)
     
     useEffect(() => {
         if (!mapRef.current) return; // mapRef가 초기화되지 않았으면 종료
@@ -31,8 +32,7 @@ const useinitOlMap = ( mapRef ) => {
         return () => {
             map.setTarget(null);
         };
-    }, [mapRef]);
-  return { olMap }
+    }, [mapRef, setOlMap]);
 }
 
-export default useinitOlMap
+export default useInitOlMap

@@ -5,10 +5,16 @@ import useLoadTerrain from "../../hooks/useLoadTerrain";
 import useCesiumLayerControls from "../../hooks/layers/useCesiumLayerControls";
 import { useSyncMap } from "../../hooks/sync/useSyncMap";
 import { useSyncZoom } from "../../hooks/sync/useSyncZoom";
+import { useShallow } from "zustand/shallow";
+import useMapStore from "../../store/useMapStore";
 
 const CesiumMap = () => {
   const viewContainerRef = useRef(null);
-  const { cesiumViewer } = useInitCesiumViewer(viewContainerRef);
+  useInitCesiumViewer(viewContainerRef);
+
+  const { cesiumViewer } = useMapStore(
+    useShallow((state) => ({ cesiumViewer: state.cesiumViewer}))
+  );
   const { toggleOSMLayer, toggleGoogleTileset, resetToDefault } = useCesiumLayerControls(cesiumViewer);
 
   useLoadTerrain(cesiumViewer);
