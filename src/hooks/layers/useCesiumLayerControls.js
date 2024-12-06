@@ -1,13 +1,12 @@
-import React from 'react'
 import useLoadOsmLayer from './useLoadOsmLayer';
 import useLoadGoogle3DTileset from './useLoadGoogle3dTileset';
 import useLoadBuildingTileset from "./useLoadBuildingTileset";
 import * as Cesium from "cesium";
 
-const useCesiumLayerControls = (viewer) => {
-  const { osmBuildings } = useLoadBuildingTileset(viewer)
-  const { osmLayer } = useLoadOsmLayer(viewer);
-  const { google3DTileset } = useLoadGoogle3DTileset(viewer);
+const useCesiumLayerControls = () => {
+  const { osmBuildings } = useLoadBuildingTileset()
+  const { osmLayer } = useLoadOsmLayer();
+  const { google3DTileset } = useLoadGoogle3DTileset();
 
   const toggleOSMLayer = () => {
     if (!osmLayer || !google3DTileset) return;

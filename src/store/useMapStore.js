@@ -2,7 +2,7 @@ import { create } from 'zustand';
 
 const useMapStore = create((set) => ({
 
-    coordinates: {
+    centerCoordinates: {
         lon: 127.3845475,
         lat: 36.3504119,
       },
@@ -10,11 +10,11 @@ const useMapStore = create((set) => ({
     cesiumViewer: null,
     olMap: null,
 
-    setCoordinates: (lon, lat) => set({ coordinates: {
+    setCenterCoordinates: (lon, lat) => set({ centerCoordinates: {
         lon: lon,
         lat: lat,
     } }),
-    
+
     setRotation: (rotation) => set(() => ({ rotation: rotation })),
     setCesiumViewer: (viewerInstance) => set(() => ({ cesiumViewer: viewerInstance })),
 

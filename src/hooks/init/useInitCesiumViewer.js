@@ -1,9 +1,11 @@
 import { useEffect } from 'react'
 import * as Cesium from "cesium";
 import useMapStore from '../../store/useMapStore';
+import { useShallow } from 'zustand/shallow';
 
 const useInitCesiumViewer = (viewContainerRef) => {
-    const setCesiumViewer = useMapStore((state) => state.setCesiumViewer)
+    const setCesiumViewer = useMapStore(useShallow((state) => state.setCesiumViewer))
+
     useEffect(() => {
         if (!viewContainerRef.current) return;
 

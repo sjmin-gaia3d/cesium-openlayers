@@ -1,4 +1,3 @@
-import React from 'react'
 import { useSyncContext } from '../../context/SyncContext';
 
 const SyncControl = () => {

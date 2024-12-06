@@ -5,10 +5,11 @@ import TileLayer from 'ol/layer/Tile';
 import { OSM } from 'ol/source';
 import { defaults } from 'ol/control/defaults';
 import useMapStore from '../../store/useMapStore';
+import { useShallow } from 'zustand/shallow';
 
 const useInitOlMap = ( mapRef ) => {
-    const setOlMap = useMapStore((state) => state.setOlMap)
-    
+    const setOlMap = useMapStore(useShallow((state) => state.setOlMap))
+
     useEffect(() => {
         if (!mapRef.current) return; // mapRef가 초기화되지 않았으면 종료
 

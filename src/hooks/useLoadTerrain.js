@@ -1,15 +1,20 @@
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 import * as Cesium from "cesium";
-const useLoadTerrain = (viewer) => {
+import useMapStore from '../store/useMapStore';
+import { useShallow } from 'zustand/shallow';
+const useLoadTerrain = () => {
+  const { cesiumViewer } = useMapStore(
+    useShallow((state) => ({ cesiumViewer: state.cesiumViewer}))
+  );
     useEffect(() => {
-        if (!viewer) return;
+        if (!cesiumViewer) return;
     
         const loadTerrain = async () => {
           const terrainProvider = await Cesium.createWorldTerrainAsync();
-          viewer.terrainProvider = terrainProvider;
+          cesiumViewer.terrainProvider = terrainProvider;
         };
         loadTerrain();
-      }, [viewer]);
+      }, [cesiumViewer]);
 }
 
 export default useLoadTerrain

@@ -17,12 +17,13 @@ const OpenLayersMap = () => {
     const { olMap } = useMapStore(
         useShallow((state) => ({ olMap: state.olMap}))
       );
-    useSyncMap({ olMap });
+    useSyncMap();
     // useSyncZoom({ olMap });
     // useAdjustZoomRange({ olMap });
 
     useEffect(() => {
         if (olMap) {
+            
             // 점 생성
             const point = new Point(fromLonLat([127.024612, 37.5326]));
             const pointFeature = new Feature({ geometry: point });

@@ -2,9 +2,22 @@ import { useCallback, useEffect } from "react";
 import { toLonLat, fromLonLat } from "ol/proj";
 import * as Cesium from "cesium";
 import { useSyncContext } from "../../context/SyncContext";
+import useMapStore from "../../store/useMapStore";
+import { useShallow } from "zustand/shallow";
 
-export const useSyncMap = ({ olMap, cesiumViewer }) => {
-  const { isSyncActive, centerCoordinates, setCenterCoordinates, rotation, setRotation } = useSyncContext();
+export const useSyncMap = () => {
+
+  const { cesiumViewer, olMap, centerCoordinates, setCenterCoordinates, rotation, setRotation } = useMapStore(
+    useShallow((state) => ({
+      cesiumViewer: state.cesiumViewer,
+      olMap: state.olMap,
+      centerCoordinates: state.centerCoordinates, setCenterCoordinates: state.setCenterCoordinates,
+      rotation: state.rotation, setRotation: state.setRotation,
+
+    }))
+  );
+
+  const { isSyncActive } = useSyncContext();
 
   const normalizeAngle = useCallback((angle) => ((angle % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI), []);
 
@@ -31,7 +44,7 @@ export const useSyncMap = ({ olMap, cesiumViewer }) => {
   const updateCenter = useCallback(
     ({ lon, lat }) => {
       if (centerCoordinates.lon !== lon || centerCoordinates.lat !== lat) {
-        setCenterCoordinates({ lon, lat });
+        setCenterCoordinates(lon, lat);
       }
     }, [centerCoordinates, setCenterCoordinates]);
 

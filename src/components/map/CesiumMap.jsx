@@ -15,14 +15,15 @@ const CesiumMap = () => {
   const { cesiumViewer } = useMapStore(
     useShallow((state) => ({ cesiumViewer: state.cesiumViewer}))
   );
-  const { toggleOSMLayer, toggleGoogleTileset, resetToDefault } = useCesiumLayerControls(cesiumViewer);
+  const { toggleOSMLayer, toggleGoogleTileset, resetToDefault } = useCesiumLayerControls();
 
-  useLoadTerrain(cesiumViewer);
+  useLoadTerrain();
 
-  useSyncMap({ cesiumViewer });
+  useSyncMap();
   //   useSyncZoom({ cesiumViewer });
   useEffect(() => {
     if (cesiumViewer) {
+      
       cesiumViewer.flyTo(
         cesiumViewer.entities.add({
           position: Cesium.Cartesian3.fromDegrees(127.024612, 37.5326),
