@@ -1,68 +1,24 @@
-import React, { useEffect, useRef, useState } from "react";
-import * as Cesium from "cesium";
+import { useRef } from "react";
 import useInitCesiumViewer from "../../hooks/init/useInitCesiumViewer";
 import useLoadTerrain from "../../hooks/useLoadTerrain";
 import useCesiumLayerControls from "../../hooks/layers/useCesiumLayerControls";
-import { useSyncMap } from "../../hooks/sync/useSyncMap";
-import { useSyncZoom } from "../../hooks/sync/useSyncZoom";
 import { useShallow } from "zustand/shallow";
 import useMapStore from "../../store/useMapStore";
+import CesiumInteraction from "../toolbar/cesium/CesiumInteraction";
+import useInitDataSource from "../../hooks/init/useInitDataSource";
 
 const CesiumMap = () => {
   const viewContainerRef = useRef(null);
   useInitCesiumViewer(viewContainerRef);
-
-  const { cesiumViewer } = useMapStore(
-    useShallow((state) => ({ cesiumViewer: state.cesiumViewer}))
-  );
   const { toggleOSMLayer, toggleGoogleTileset, resetToDefault } = useCesiumLayerControls();
-
   useLoadTerrain();
-
-
-  //   useSyncZoom({ cesiumViewer });
-  useEffect(() => {
-    if (cesiumViewer) {
-      
-      cesiumViewer.flyTo(
-        cesiumViewer.entities.add({
-          position: Cesium.Cartesian3.fromDegrees(127.024612, 37.5326),
-          point: {
-            pixelSize: 10,
-            color: Cesium.Color.RED,
-            heightReference: Cesium.HeightReference.CLAMP_TO_GROUND, // 지형에 붙이기
-          },
-        })
-      )
-      cesiumViewer.entities.add({
-        polyline: {
-          positions: Cesium.Cartesian3.fromDegreesArray([
-            127.024612, 37.5326,
-            126.978388, 37.566536,
-          ]),
-          width: 3,
-          material: Cesium.Color.BLUE,
-          clampToGround: true, // 지형에 붙이기
-        },
-      });
-
-      cesiumViewer.entities.add({
-        polygon: {
-          hierarchy: Cesium.Cartesian3.fromDegreesArray([
-            127.024612, 37.5326,
-            126.978388, 37.566536,
-            127.035278, 37.582839,
-          ]),
-          material: Cesium.Color.GREEN.withAlpha(0.5),
-          classificationType: Cesium.ClassificationType.TERRAIN, // 지형에 붙이기
-        },
-      });
-
-    }
-  }, [cesiumViewer])
+  const dataSources = "dataSource";
+  useInitDataSource(dataSources)
 
   return (
-    <div ref={viewContainerRef} style={{ position: "relative", width: "100%", height: "100vh" }}>
+    <div style={{ display: "flex", flexDirection: "column"}}>
+      <CesiumInteraction />
+      <div ref={viewContainerRef} style={{ flex: 1, width: '100%' }}></div>
     </div>
   );
 };
