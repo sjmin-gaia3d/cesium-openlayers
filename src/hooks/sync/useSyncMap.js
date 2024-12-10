@@ -1,11 +1,15 @@
-import { useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { toLonLat, fromLonLat } from "ol/proj";
 import * as Cesium from "cesium";
-import { useSyncContext } from "../../context/SyncContext";
 import useMapStore from "../../store/useMapStore";
 import { useShallow } from "zustand/shallow";
 
-export const useSyncMap = (isSyncActive) => {
+export const useSyncMap = () => {
+  const [isSyncActive, setIsSyncActive] = useState(false); // useState로 상태 관리
+
+  const toggleSync = () => {
+    setIsSyncActive((prev) => !prev); // 상태 업데이트
+  };
 
   const { cesiumViewer, olMap, centerCoordinates, setCenterCoordinates, rotation, setRotation } = useMapStore(
     useShallow((state) => ({
@@ -203,4 +207,6 @@ export const useSyncMap = (isSyncActive) => {
   useEffect(() => {
     console.log(rotation);
   }, [rotation])
+
+  return { isSyncActive, toggleSync }
 };
