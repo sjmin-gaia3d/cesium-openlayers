@@ -1,3 +1,4 @@
+import { convertFeatureToStoreSelectedObject } from "../utils/objectConvertUtils";
 import * as OpenlayersInteractionUtils from "../utils/openlayersInteractionUtils"
 
 const ACTIVE_INTERACTIVE_TYPES = {
@@ -11,7 +12,8 @@ const openlayersInteractiveHandler = (
     activeInteraction, setActiveInteraction,
     activeDrawType, setActiveDrawType,
     olMap,
-    vectorSource
+    vectorSource,
+    setSelectedObject
 ) => {
 
     const handleActiveInteraction = (interactiveTypes, drawTypes) => {
@@ -40,7 +42,9 @@ const openlayersInteractiveHandler = (
             setActiveInteraction(null);
 
         } else {
-            OpenlayersInteractionUtils.activateDraw(drawTypes, olMap, vectorSource);
+            OpenlayersInteractionUtils.activateDraw(drawTypes, olMap, vectorSource, (object)=> {
+                setSelectedObject(convertFeatureToStoreSelectedObject(object, interactiveTypes))
+            });
             setActiveDrawType(drawTypes);
             setActiveInteraction(interactiveTypes);
         }
@@ -52,7 +56,9 @@ const openlayersInteractiveHandler = (
         if (activeInteraction === interactiveTypes) {
             setActiveInteraction(null);
         } else {
-            OpenlayersInteractionUtils.activateSelect(olMap);
+            OpenlayersInteractionUtils.activateSelect(olMap, (object)=> {
+                setSelectedObject(convertFeatureToStoreSelectedObject(object, interactiveTypes))
+            });
             setActiveInteraction(interactiveTypes);
         }
     };
@@ -63,7 +69,9 @@ const openlayersInteractiveHandler = (
         if (activeInteraction === interactiveTypes) {
             setActiveInteraction(null);
         } else {
-            OpenlayersInteractionUtils.activateModify(olMap, vectorSource);
+            OpenlayersInteractionUtils.activateModify(olMap, vectorSource, (object)=> {
+                setSelectedObject(convertFeatureToStoreSelectedObject(object[0], interactiveTypes))
+            });
             setActiveInteraction(interactiveTypes);
         }
     };
@@ -74,7 +82,9 @@ const openlayersInteractiveHandler = (
         if (activeInteraction === interactiveTypes) {
             setActiveInteraction(null);
         } else {
-            OpenlayersInteractionUtils.activateSelectRemove(olMap, vectorSource);
+            OpenlayersInteractionUtils.activateSelectRemove(olMap, vectorSource, (object)=> {
+                setSelectedObject(convertFeatureToStoreSelectedObject(object, interactiveTypes))
+            });
             setActiveInteraction(interactiveTypes);
         }
     };

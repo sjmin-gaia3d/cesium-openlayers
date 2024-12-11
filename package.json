@@ -11,9 +11,11 @@
   },
   "dependencies": {
     "cesium": "^1.124.0",
+    "middleware": "^1.0.0",
     "ol": "^10.3.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "uuid": "^11.0.3",
     "zustand": "^5.0.2"
   },
   "devDependencies": {

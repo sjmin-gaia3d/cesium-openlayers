@@ -1,4 +1,5 @@
 import * as CesiumInteractionUtils from "../utils/cesiumInteractionUtils"
+import { convertEntityToStoreSelectedObject } from "../utils/objectConvertUtils";
 
 const ACTIVE_INTERACTIVE_TYPES = {
     DRAW: 'Draw',
@@ -11,7 +12,8 @@ const cesiumInteractiveHandler = (
     activeInteraction, setActiveInteraction,
     activeDrawType, setActiveDrawType,
     cesiumViewer,
-    dataSource
+    dataSource,
+    setSelectedObject,
 ) => {
 
     const handleActiveInteraction = (interactiveTypes, drawTypes) => {
@@ -40,7 +42,9 @@ const cesiumInteractiveHandler = (
             setActiveInteraction(null);
 
         } else {
-            CesiumInteractionUtils.activateDraw(drawTypes, cesiumViewer, dataSource);
+            CesiumInteractionUtils.activateDraw(drawTypes, cesiumViewer, dataSource, (object) => {
+                setSelectedObject(convertEntityToStoreSelectedObject(object, interactiveTypes))
+            });
             setActiveDrawType(drawTypes);
             setActiveInteraction(interactiveTypes);
         }
@@ -52,7 +56,9 @@ const cesiumInteractiveHandler = (
         if (activeInteraction === interactiveTypes) {
             setActiveInteraction(null);
         } else {
-            CesiumInteractionUtils.activateSelect(cesiumViewer);
+            CesiumInteractionUtils.activateSelect(cesiumViewer, (object) => {
+                setSelectedObject(convertEntityToStoreSelectedObject(object, interactiveTypes))
+            });
             setActiveInteraction(interactiveTypes);
         }
     };
@@ -63,7 +69,9 @@ const cesiumInteractiveHandler = (
         if (activeInteraction === interactiveTypes) {
             setActiveInteraction(null);
         } else {
-            CesiumInteractionUtils.activateModify(cesiumViewer, dataSource);
+            CesiumInteractionUtils.activateModify(cesiumViewer, dataSource, (object) => {
+                setSelectedObject(convertEntityToStoreSelectedObject(object, interactiveTypes))
+            });
             setActiveInteraction(interactiveTypes);
         }
     };
@@ -74,7 +82,9 @@ const cesiumInteractiveHandler = (
         if (activeInteraction === interactiveTypes) {
             setActiveInteraction(null);
         } else {
-            CesiumInteractionUtils.activateSelectRemove(cesiumViewer, dataSource);
+            CesiumInteractionUtils.activateSelectRemove(cesiumViewer, dataSource, (object) => {
+                setSelectedObject(convertEntityToStoreSelectedObject(object, interactiveTypes))
+            })
             setActiveInteraction(interactiveTypes);
         }
     };
