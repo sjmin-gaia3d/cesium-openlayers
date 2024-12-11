@@ -8,9 +8,9 @@ const OpenLayersMap = () => {
     useInitOlMap(mapRef);
     useInitVectorSource();
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
+        <div style={{ flex: 1 }}>
             <OpenLayersInteraction /> {/* 툴바 컴포넌트 */}
-            <div ref={mapRef} style={{ flex: 1, width: '100%' }}></div>
+            <div ref={mapRef} style={{ height: '80vh' }}></div>
         </div>
     );
 };
