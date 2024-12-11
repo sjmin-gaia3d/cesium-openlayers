@@ -16,9 +16,9 @@ const CesiumMap = () => {
   useInitDataSource(dataSources)
 
   return (
-    <div style={{ display: "flex", flexDirection: "column"}}>
+    <div style={{ flex:1 }}>
       <CesiumInteraction />
-      <div ref={viewContainerRef} style={{ flex: 1, width: '100%' }}></div>
+      <div ref={viewContainerRef} style={{ height: '80vh' }}></div>
     </div>
   );
 };
