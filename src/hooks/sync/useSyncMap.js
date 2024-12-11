@@ -3,8 +3,10 @@ import { toLonLat, fromLonLat } from "ol/proj";
 import * as Cesium from "cesium";
 import useMapStore from "../../store/useMapStore";
 import { useShallow } from "zustand/shallow";
+import * as SyncMapUtils from "../../utils/syncMapUtils"
 
-export const useSyncMap = () => {
+const useSyncMap = () => {
+
   const [isSyncActive, setIsSyncActive] = useState(false); // useState로 상태 관리
 
   const toggleSync = () => {
@@ -21,27 +23,6 @@ export const useSyncMap = () => {
     }))
   );
 
-  const normalizeAngle = useCallback((angle) => ((angle % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI), []);
-
-  const cesiumToOlRotation = useCallback(
-    (cesiumHeading) => {
-      const normalizedCesiumHeading = normalizeAngle(cesiumHeading);
-      const openLayersRotation = -((normalizedCesiumHeading + Math.PI) % (2 * Math.PI) - Math.PI);
-      console.log(
-        `cesiumToOlRotation: CesiumHeading(${cesiumHeading}) -> OpenLayersRotation(${openLayersRotation})`
-      );
-      return openLayersRotation;
-    }, [normalizeAngle])
-
-  const olToCesiumRotation = useCallback(
-    (olRotation) => {
-      const normalizedOlRotation = normalizeAngle(olRotation);
-      const cesiumHeading = normalizeAngle(-normalizedOlRotation);
-      console.log(
-        `olToCesiumRotation: OlRotation(${olRotation}) -> CesiumHeading(${cesiumHeading})`
-      );
-      return cesiumHeading;
-    }, [normalizeAngle])
   // 중심 좌표를 업데이트하는 공통 함수
   const updateCenter = useCallback(
     ({ lon, lat }) => {
@@ -58,15 +39,14 @@ export const useSyncMap = () => {
         switch (type) {
           case "openLayers":
             // OpenLayers 값은 변환 후 Cesium 기준으로 저장
-            const convertedRotation = olToCesiumRotation(newRotation);
-            setRotation(convertedRotation);
+            setRotation(SyncMapUtils.olToCesiumRotation(newRotation));
             break;
           case "cesium":
             setRotation(newRotation);
             break;
         }
       }
-    }, [rotation, setRotation, olToCesiumRotation]);
+    }, [rotation, setRotation]);
 
   // OpenLayers에서 중심 좌표 가져오기
   const getOlMapCenter = useCallback(() => {
@@ -118,17 +98,16 @@ export const useSyncMap = () => {
     if (rotation) updateRotation(rotation, "cesium");
   }, [getCesiumCenter, updateCenter, getCesiumRotation, updateRotation]);
 
-
   // 중심 좌표, 회전값을 OpenLayers로 동기화
   const syncToOlMap = useCallback(() => {
     if (!olMap) return;
     const view = olMap.getView();
     const newCenter = fromLonLat([centerCoordinates.lon, centerCoordinates.lat]);
-    const newRotation = cesiumToOlRotation(rotation);
+    const newRotation = SyncMapUtils.cesiumToOlRotation(rotation);
     view.setCenter(newCenter);
     view.setRotation(newRotation);
 
-  }, [olMap, centerCoordinates, rotation, cesiumToOlRotation]);
+  }, [olMap, centerCoordinates, rotation]);
 
   // 중심 좌표, 회전값을 Cesium으로 동기화
   const syncToCesium = useCallback(() => {
@@ -180,21 +159,22 @@ export const useSyncMap = () => {
       }
     }, [cesiumViewer]);
 
-  // 이벤트 등록 및 해제
+  // OpenLayers이벤트 등록 및 해제
   useEffect(() => {
-
-    // OpenLayers 이벤트 등록
     manageOlMapEvents("add", updateFromOlMap);
-    // Cesium 이벤트 등록
-    manageCesiumEvents("add", updateFromCesium);
-
     return () => {
-      // OpenLayers 이벤트 해제
       manageOlMapEvents("remove", updateFromOlMap);
-      // Cesium 이벤트 해제
+    };
+  }, [manageOlMapEvents, updateFromOlMap]);
+
+  // Cesium이벤트 등록 및 해제
+  useEffect(() => {
+    manageCesiumEvents("add", updateFromCesium);
+    return () => {
       manageCesiumEvents("remove", updateFromCesium);
     };
-  }, [manageOlMapEvents, manageCesiumEvents, updateFromCesium, updateFromOlMap]);
+  }, [manageCesiumEvents, updateFromCesium]);
+
 
   // map 동기화
   useEffect(() => {
@@ -210,3 +190,5 @@ export const useSyncMap = () => {
 
   return { isSyncActive, toggleSync }
 };
+
+export default useSyncMap;

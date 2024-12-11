@@ -2,13 +2,13 @@ import { create } from 'zustand';
 import { combine } from 'zustand/middleware';
 import { devtools } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
-import { convertEntityToStoreSelectedObject, convertFeatureToStoreSelectedObject } from '../utils/objectConvertUtils';
 
 // 초기 상태 정의
 const initialSelectedObject = {
     id: null,
     from: null,
     type: null,
+    activate: null, // draw, select, remove, modifty
     style: null,
     coordinates: [], // WGS84; EPSG:4326
     meta: null,
@@ -37,7 +37,6 @@ const useObjectStore = create(
                 })
             )
         ),
-        { name: 'selectedObjectStore' }
     )
 );
 

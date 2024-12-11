@@ -3,6 +3,7 @@ import { useShallow } from 'zustand/shallow';
 import useDataSourceStore from '../../../store/useDataSourceStore';
 import { useState } from 'react';
 import cesiumInteractiveHandler from '../../../handlers/cesiumInteractiveHandler';
+import useObjectStore from '../../../store/useObjectStore';
 
 const ACTIVE_INTERACTIVE_TYPES = {
     DRAW: 'Draw',
@@ -13,7 +14,7 @@ const ACTIVE_INTERACTIVE_TYPES = {
 
 const ACTIVE_DRAW_TYPES = {
     POINT: 'Point',
-    POLY_LINE: 'PolyLine',
+    LINE: 'PolyLine',
     POLYGON: 'Polygon',
     NONE: null,
 };
@@ -24,7 +25,7 @@ const BUTTON_STYLE = {
 }
 
 const CesiumInteraction = () => {
-    
+
     const [activeInteraction, setActiveInteraction] = useState(null);
     const [activeDrawType, setActiveDrawType] = useState(null);
 
@@ -40,16 +41,25 @@ const CesiumInteraction = () => {
         )
     );
 
+    const { setSelectedObject } = useObjectStore(
+        useShallow(
+            (state) => ({
+                setSelectedObject: state.setSelectedObject,
+            })
+        )
+    );
+
+
     // 핸들러 호출
     const handleActiveInteraction = (interactiveTypes, drawTypes) => {
         cesiumInteractiveHandler(
             activeInteraction, setActiveInteraction,
             activeDrawType, setActiveDrawType,
             cesiumViewer,
-            dataSource
+            dataSource,
+            setSelectedObject
         ).handleActiveInteraction(interactiveTypes, drawTypes);
     };
-
     return (
         <div style={{ padding: '10px', background: '#f4f4f4', borderBottom: '1px solid #ddd' }}>
             <button
@@ -59,8 +69,8 @@ const CesiumInteraction = () => {
                 Draw Point
             </button>
             <button
-                onClick={() => handleActiveInteraction(ACTIVE_INTERACTIVE_TYPES.DRAW, ACTIVE_DRAW_TYPES.POLY_LINE)}
-                style={{ backgroundColor: activeDrawType === ACTIVE_DRAW_TYPES.POLY_LINE ? BUTTON_STYLE.DEACTIVE : BUTTON_STYLE.ACTIVE }}
+                onClick={() => handleActiveInteraction(ACTIVE_INTERACTIVE_TYPES.DRAW, ACTIVE_DRAW_TYPES.LINE)}
+                style={{ backgroundColor: activeDrawType === ACTIVE_DRAW_TYPES.LINE ? BUTTON_STYLE.DEACTIVE : BUTTON_STYLE.ACTIVE }}
             >
                 Draw Line
             </button>
@@ -76,7 +86,7 @@ const CesiumInteraction = () => {
             >
                 Remove
             </button>
-            
+
             <button
                 onClick={() => handleActiveInteraction(ACTIVE_INTERACTIVE_TYPES.SELECT, ACTIVE_DRAW_TYPES.NONE)}
                 style={{ backgroundColor: activeInteraction === ACTIVE_INTERACTIVE_TYPES.SELECT ? BUTTON_STYLE.DEACTIVE : BUTTON_STYLE.ACTIVE }}
