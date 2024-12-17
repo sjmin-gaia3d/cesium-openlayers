@@ -13,6 +13,92 @@ import { olToWGS84, cesiumToWGS84, wgs84ToOl, wgs84ToCesium } from './coordinate
 import { LineString, Point, Polygon } from 'ol/geom';
 import { Feature } from 'ol';
 
+// OpenLayers Feature -> Cesium Entity 변환 함수
+export const featureToEntity = (feature) => {
+    const geometry = feature.getGeometry();
+    const type = geometry.getType(); // Geometry 타입 (Point, LineString, Polygon 등)
+
+    let entity;
+    switch (type) {
+        case 'Point':
+            {
+                const coordinates = geometry.getCoordinates(); // [lon, lat]
+                entity = new Cesium.Entity({
+                    position: Cesium.Cartesian3.fromDegrees(coordinates[0], coordinates[1]),
+                    point: {
+                        pixelSize: 10,
+                        color: Cesium.Color.BLUE,
+                    },
+                });
+                break;
+            }
+
+        case 'LineString':
+            {
+                const lineCoordinates = geometry.getCoordinates(); // [[lon1, lat1], [lon2, lat2], ...]
+                entity = new Cesium.Entity({
+                    polyline: {
+                        positions: Cesium.Cartesian3.fromDegreesArray(
+                            lineCoordinates.flat()
+                        ),
+                        width: 2,
+                        material: Cesium.Color.RED,
+                    },
+                });
+                break;
+            }
+
+        case 'Polygon':
+            {
+                const polygonCoordinates = geometry.getCoordinates()[0]; // 외곽선 좌표 [[lon1, lat1], ...]
+                entity = new Cesium.Entity({
+                    polygon: {
+                        hierarchy: new Cesium.PolygonHierarchy(
+                            Cesium.Cartesian3.fromDegreesArray(polygonCoordinates.flat())
+                        ),
+                        material: Cesium.Color.YELLOW.withAlpha(0.5),
+                    },
+                });
+                break;
+            }
+
+        default:
+            console.error('Unsupported geometry type:', type);
+    }
+
+    return entity;
+}
+
+
+// Cesium Entity -> OpenLayers Feature 변환 함수
+export const entityToFeature = (entity) => {
+    if (!entity || !entity.position) {
+        console.error('Invalid entity');
+        return;
+    }
+
+    // 현재 시간 기준으로 위치 가져오기
+    const position = entity.position.getValue(Cesium.JulianDate.now());
+    if (!position) return;
+
+    const cartographic = Cesium.Cartographic.fromCartesian(position);
+    const lon = Cesium.Math.toDegrees(cartographic.longitude);
+    const lat = Cesium.Math.toDegrees(cartographic.latitude);
+
+    // OpenLayers Feature 생성
+    const olGeometry = new Point([lon, lat]);
+    const feature = new Feature({
+        geometry: olGeometry,
+    });
+
+    // 추가 속성 매핑 (Entity의 name 또는 속성 데이터를 Feature에 추가)
+    if (entity.name) {
+        feature.set('name', entity.name);
+    }
+    return feature;
+}
+
+
 // map object -> selectedObject
 
 // OpenLayers Feature -> selectedObject
@@ -26,7 +112,6 @@ export const convertFeatureToStoreSelectedObject = (feature, activate) => {
         from: FROM_TYPES.OPEN_LAYERS,
         type: geometry?.getType() || null,
         activate: activate,
-        style: feature.getStyle() || null,
         coordinates: olToWGS84(geometry.getCoordinates()),
         meta: createMetaData()
     };
@@ -92,14 +177,6 @@ export const convertStoreSelectedObjectToFeature = (selectedObject) => {
                 // 스타일 적용
                 if (style) {
                     const { color, pixelSize } = style;
-                    // feature.setStyle(new Style({
-                    //     image: new Circle({
-                    //         radius: pixelSize || 5,
-                    //         fill: new Fill({
-                    //             color: `rgba(${color.red * 255}, ${color.green * 255}, ${color.blue * 255}, ${color.alpha})`,
-                    //         }),
-                    //     }),
-                    // }));
                 }
 
                 return feature;
@@ -124,14 +201,6 @@ export const convertStoreSelectedObjectToFeature = (selectedObject) => {
                 // 스타일 적용
                 if (style) {
                     const { color, pixelSize } = style;
-                    // feature.setStyle(new Style({
-                    //     image: new Circle({
-                    //         radius: pixelSize || 5,
-                    //         fill: new Fill({
-                    //             color: `rgba(${color.red * 255}, ${color.green * 255}, ${color.blue * 255}, ${color.alpha})`,
-                    //         }),
-                    //     }),
-                    // }));
                 }
                 return feature;
             }
@@ -153,14 +222,6 @@ export const convertStoreSelectedObjectToFeature = (selectedObject) => {
             // 스타일 적용
             if (style) {
                 const { color, pixelSize } = style;
-                // feature.setStyle(new Style({
-                //     image: new Circle({
-                //         radius: pixelSize || 5,
-                //         fill: new Fill({
-                //             color: `rgba(${color.red * 255}, ${color.green * 255}, ${color.blue * 255}, ${color.alpha})`,
-                //         }),
-                //     }),
-                // }));
             }
             console.log("Polygon add!")
             return feature;
@@ -192,25 +253,26 @@ export const convertStoreSelectedObjectToEntity = (selectedObject) => {
                 });
                 return entity;
             }
-            case "LineString":
-                {
-                    const { coordinates, id, style, meta } = selectedObject;
-    
-                    // 좌표 변환: WGS84 -> EPSG:3857
-                    const transformedCoordinates = wgs84ToCesium(coordinates);
-                    console.log("LineString coordinates:", transformedCoordinates);
-    
-                    // Entity 생성
-                    const entity = new Cesium.Entity({
-                        polyline: {
-                            positions: transformedCoordinates,
-                            material: style?.color || Cesium.Color.BLUE.withAlpha(0.5),
-                        },
-                        id,
-                        meta,
-                    });
-                    return entity;
-                }
+        case "LineString":
+            {
+                const { coordinates, id, style, meta } = selectedObject;
+
+                // 좌표 변환: WGS84 -> EPSG:3857
+                const transformedCoordinates = wgs84ToCesium(coordinates);
+                console.log("LineString coordinates:", transformedCoordinates);
+
+                // Entity 생성
+                const entity = new Cesium.Entity({
+                    polyline: {
+                        positions: transformedCoordinates,
+                        width: 5,
+                        material: Cesium.Color.BLUE,
+                    },
+                    id,
+                    meta,
+                });
+                return entity;
+            }
         case "Polygon":
             {
                 const { coordinates, id, style, meta } = selectedObject;
@@ -225,7 +287,7 @@ export const convertStoreSelectedObjectToEntity = (selectedObject) => {
                 const entity = new Cesium.Entity({
                     polygon: {
                         hierarchy: hierarchy,
-                        material: style?.color || Cesium.Color.GREEN.withAlpha(0.5),
+                        material: Cesium.Color.GREEN.withAlpha(0.5),
                     },
                     id,
                     meta,
