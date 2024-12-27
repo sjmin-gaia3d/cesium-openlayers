@@ -1,9 +1,9 @@
-import useSyncMap from '../../../hooks/sync/useSyncMap';
+import useSyncMaps from '../../../hooks/sync/useSyncMaps';
 import useSyncObject from '../../../hooks/sync/useSyncObject';
 
 const SyncControl = () => {
 
-  const { isSyncActive, toggleSync } = useSyncMap(); // isSyncActive 값을 useSyncMap에 전달
+  const { isSyncActive, toggleSync } = useSyncMaps(); // isSyncActive 값을 useSyncMap에 전달
   useSyncObject()
   return (
     <div>
