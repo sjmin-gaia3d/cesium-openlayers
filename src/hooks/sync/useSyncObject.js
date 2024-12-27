@@ -33,7 +33,7 @@ const useSyncObject = () => {
     useEffect(() => {
         if (!selectedObject) return;
 
-        if (selectedObject.from !== FROM_TYPES.CESIUM || !vectorSource) return;
+        if (selectedObject.from === FROM_TYPES.OPEN_LAYERS || !vectorSource) return;
 
         if (selectedObject.activate === ACTIVE_INTERACTIVE_TYPES.DRAW) {
             // Cesium -> OpenLayers 동기화
@@ -54,12 +54,11 @@ const useSyncObject = () => {
             vectorSource.removeFeature(feature);
         }
 
-
     }, [selectedObject, vectorSource]);
 
     useEffect(() => {
         if (!selectedObject) return;
-        if (selectedObject.from !== FROM_TYPES.OPEN_LAYERS || !dataSource) return;
+        if (selectedObject.from === FROM_TYPES.CESIUM || !dataSource) return;
 
         if (selectedObject.activate === ACTIVE_INTERACTIVE_TYPES.DRAW) {
             // OpenLayers -> Cesium 동기화

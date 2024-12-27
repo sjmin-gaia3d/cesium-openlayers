@@ -114,10 +114,10 @@ const useActivateCesium = ( { label } ) => {
             console.log( "Picked object:", pickedObject );
 
             if ( pickedObject?.id ) {
-                dataSource.entities.remove( pickedObject.id );
                 setSelectedObject?.(
                     convertEntityToStoreSelectedObject( pickedObject.id, ACTIVE_INTERACTIVE_TYPES.REMOVE )
                 );
+                dataSource.entities.remove( pickedObject.id );
             }
         }
     }
