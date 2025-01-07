@@ -13,13 +13,26 @@ const useInitDataSource = (dataSourceName) => {
         useShallow((state) => state.setDataSource)
     ))
 
+    const setCzmlDataSource = useDataSourceStore((
+        useShallow((state) => state.setCzmlDataSource)
+    ))
+
     useEffect(() => {
         if (!cesiumViewer) return;
 
         const dataSource = new Cesium.CustomDataSource(dataSourceName);
+        const czmlDataSource = new Cesium.CzmlDataSource();
         cesiumViewer.dataSources.add(dataSource);
+        cesiumViewer.dataSources.add(czmlDataSource);
         setDataSource(dataSource);
-    }, [cesiumViewer, setDataSource, dataSourceName])
+        setCzmlDataSource(czmlDataSource)
+
+        return () => {
+            cesiumViewer.dataSources.remove(dataSource, true);
+            cesiumViewer.dataSources.remove(czmlDataSource, true);
+        };
+
+    }, [cesiumViewer, setDataSource, dataSourceName, setCzmlDataSource])
 }
 
 export default useInitDataSource

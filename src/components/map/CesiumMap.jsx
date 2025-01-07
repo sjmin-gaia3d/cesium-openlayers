@@ -2,9 +2,8 @@ import { useRef } from "react";
 import useInitCesiumViewer from "../../hooks/init/useInitCesiumViewer";
 import useLoadTerrain from "../../hooks/useLoadTerrain";
 import useCesiumLayerControls from "../../hooks/layers/useCesiumLayerControls";
-import { useShallow } from "zustand/shallow";
-import useMapStore from "../../store/useMapStore";
 import CesiumInteraction from "../toolbar/cesium/CesiumInteraction";
+import CesiumCZMLEditor from "../toolbar/cesium/CesiumCZMLEditor.jsx";
 import useInitDataSource from "../../hooks/init/useInitDataSource";
 
 const CesiumMap = () => {
@@ -18,6 +17,7 @@ const CesiumMap = () => {
   return (
     <div style={{ flex:1 }}>
       <CesiumInteraction />
+      <CesiumCZMLEditor />
       <div ref={viewContainerRef} style={{ height: '80vh' }}></div>
     </div>
   );
